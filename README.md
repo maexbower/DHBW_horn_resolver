@@ -1,2 +1,9 @@
 # DHBW_horn_resolver
-Algorythmus zur Resulotion von Horn Formeln
+Algorithmus zur Resolution von Horn Formeln
+
+## Usage
+Clone Repository
+
+make
+
+./hornschema [Path to File]

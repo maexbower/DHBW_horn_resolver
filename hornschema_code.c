@@ -175,33 +175,54 @@ bodyElem* addToBodyElem(bodyElem *list, atomElem *elem)
 }
 formelList* addToFormelListe(formelList *list, formelElem *elem)
 {
-  formelList *newList = createFormelListe();
-  newList->next = list;
-  newList->elem = elem;
-  return newList;
+  //formelList *newList = createFormelListe();
+  //newList->next = list;
+  //newList->elem = elem;
+  //return newList;
+    if(list->elem)
+    {
+      formelList *newList = createFormelListe();
+      formelList *tmp = list;
+      //gehe durch die Liste und füge das Element am Ende ein.
+      //Wenn es bereits existiert füge es nicht nochmal ein.
+      do
+      {
+        if(istGleichesFormelElem(tmp->elem, elem))
+        {
+          return list;
+        }
+        if(tmp->next)
+        {
+          tmp = tmp->next;
+        }
+      }while(tmp->next);
+      tmp->next = newList;
+      tmp->next->elem = elem;
+    }else{
+      list->elem = elem;
+    }
+    return list;
 }
 atomList* addToAtomListe(atomList *list, atomElem *elem)
 {
+
   if(list->elem)
   {
     atomList *newList = createAtomListe();
     atomList *tmp = list;
     //gehe durch die Liste und füge das Element am Ende ein.
     //Wenn es bereits existiert füge es nicht nochmal ein.
-    while(tmp->next)
+    do
     {
-      fprintf(TEXTOUT, "Vergleiche Atom: ");
-      printAtomElemShort(tmp->elem);
-      fprintf(TEXTOUT, " mit: ");
-      printAtomElemShort(elem);
-      fprintf(TEXTOUT, "\n");
       if(istGleichesAtomElem(tmp->elem, elem))
       {
-        fprintf(TEXTOUT, "gleiches Atom in Liste");
         return list;
       }
-      tmp = tmp->next;
-    }
+      if(tmp->next)
+      {
+        tmp = tmp->next;
+      }
+    }while(tmp->next);
     tmp->next = newList;
     tmp->next->elem = elem;
   }else{
@@ -368,12 +389,43 @@ int istGleicheTermListe(termList *liste, termList *vergleich)
   }
   return 1;
 }
+int istGleichesFormelElem(formelElem *elem, formelElem *vergleich)
+{
+  int returnval = 0;
+  if(elem && vergleich)
+  {
+    if(elem->kopf && vergleich->kopf)
+    {
+      returnval += istGleichesAtomElem(elem->kopf->atom, vergleich->kopf->atom);
+    }else{
+      if(elem->kopf || vergleich->kopf)
+      {
+        return 0;
+      }
+    }
+    if(elem->body && vergleich->body)
+    {
+      returnval += istGleicheAtomListe(elem->body->atomlist, vergleich->body->atomlist);
+    }else{
+      if(elem->body || vergleich->body)
+      {
+        return 0;
+      }
+    }
+  }else{
+    if(elem || vergleich)
+    {
+      return 0;
+    }
+  }
+  return returnval;
+}
 int istGleichesAtomElem(atomElem *elem, atomElem *vergleich)
 {
   if(elem && vergleich)
   {
     //wenn beide nicht der Nullpointer sind:
-    if(strcmp(elem->praedikat, vergleich->praedikat) != 0)
+    if(strcmp(elem->praedikat, vergleich->praedikat) == 0)
     {
       if(istGleicheTermListe(elem->argument, vergleich->argument))
       {
@@ -397,8 +449,9 @@ int istGleichesTermElem(termElem *elem, termElem *vergleich)
 {
   if(elem && vergleich)
   {
+
     //wenn beide nicht der Nullpointer sind:
-    if(strcmp(elem->name, vergleich->name) != 0)
+    if(strcmp(elem->name, vergleich->name) == 0)
     {
       if(istGleicheTermListe(elem->argument, vergleich->argument))
       {
@@ -533,4 +586,157 @@ atomList* getTrueAtoms(formelList *list)
     tmp = tmp->next;
   }
   return newList;
+}
+bodyElem* removeFromBodyElem(bodyElem *list, atomElem *elem)
+{
+  if(list->atomlist)
+  {
+    list->atomlist = removeFromAtomList(list->atomlist, elem);
+  }
+  return list;
+}
+atomList* removeFromAtomList(atomList *list, atomElem *elem)
+{
+  atomList* tmp = list;
+  //Wenn es das erste Element ist muss es besonders behandelt werden.
+  if(istGleichesAtomElem(tmp->elem, elem))
+  {
+    if(tmp->next)
+    {
+        list = tmp->next;
+    }else{
+      list->elem = 0;
+      list->next = 0;
+    }
+    //Element kann nur ein mal drin sein.
+    return list;
+  }
+  do {
+    if(tmp->next)
+    {
+      if(istGleichesAtomElem(tmp->next->elem, elem))
+      {
+        //lösche nächstes Element aus der Liste
+        tmp->next = tmp->next->next;
+      }
+
+      tmp = tmp->next;
+    }
+  } while(tmp->next);
+  return list;
+}
+formelList* removeFromFormelListe(formelList *list, formelElem *elem)
+{
+  formelList *tmp = list;
+  //Erster Fall: Formel ist erstes Element:
+  if(istGleichesFormelElem(tmp->elem, elem))
+  {
+    if(tmp->next)
+    {
+      list = list->next;
+    }else{
+      list->elem = 0;
+      list->next = 0;
+    }
+  }
+  //zweiter Fall: Formel ist irgendwo in der Liste
+  do {
+      if(tmp->next)
+      {
+        if(istGleichesFormelElem(tmp->next->elem, elem))
+        {
+          //lösche nächstes Element aus der Liste
+          tmp->next = tmp->next->next;
+        }
+
+        tmp = tmp->next;
+      }
+    } while(tmp->next);
+    return list;
+}
+atomElem** findAtomElemInFormel(formelElem* list, atomElem* elem)
+{
+  if(list->kopf)
+  {
+    if(istGleichesAtomElem(list->kopf->atom, elem))
+    {
+      return &(list->kopf->atom);
+    }
+  }
+  if(list->body)
+  {
+    atomList *tmp = list->body->atomlist;
+    do {
+      if(istGleichesAtomElem(tmp->elem, elem))
+      {
+          return &(tmp->elem);
+      }
+      if(tmp->next)
+      {
+        tmp = tmp->next;
+      }
+    } while(tmp->next);
+  }
+  return 0;
+}
+int SLDsatisfiable(formelElem *query, formelList *definite)
+{
+  //Returns 0 when unsatisfiable and >0 when satisfiable
+  //if query == [] then return unsatisfiable
+  if(query == 0)
+  {
+    return 0;
+  }
+  //else let query = {l1 , l2 , ... , ln}
+  formelList *tmpDefinite = definite;
+  atomElem *l1 = query->body->atomlist->elem;
+  formelList *unifiableFormeln = createFormelListe();
+  //let C be the Elements of D whose head is unifiable with l1
+  do {
+    if(isUnifiable(l1, tmpDefinite->elem->kopf->atom))
+    {
+      unifiableFormeln = addToFormelListe(unifiableFormeln, tmpDefinite->elem);
+    }
+    if(tmpDefinite->next)
+    {
+      tmpDefinite = tmpDefinite->next;
+    }
+  } while(tmpDefinite->next);
+  //for all c e C do
+  tmpDefinite = unifiableFormeln;
+  do {
+    //   let b be the body of c
+    //   let query_new = {l2, ..., ln} u b
+    //   if SLDsatisfiable(query_new, D) then return satisfiable
+
+
+    if(tmpDefinite->next)
+    {
+      tmpDefinite = tmpDefinite->next;
+    }
+  }while(tmpDefinite->next);
+
+  //return unsatisfiable
+  return 0;
+}
+int SETsatisfiable(formelList *query, formelList *definite)
+{
+  formelList *tmp = query;
+  do {
+    if(SLDsatisfiable(tmp->elem, definite))
+    {
+      return 1;
+    }
+    if(tmp->next)
+    {
+      tmp = tmp->next;
+    }
+  } while(tmp->next);
+  return 0;
+}
+int isUnifiable(atomElem *elem, atomElem *vergleich)
+{
+  //Returns 0 when not unifiable and > 0 when unifiable
+  //ToDo
+  return 0;
 }

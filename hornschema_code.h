@@ -69,6 +69,7 @@ void printAtomListeShort(atomList *liste);
 void printFormelListeShort(formelList *liste);
 int istGleicheAtomListe(atomList *liste, atomList *vergleich);
 int istGleicheTermListe(termList *liste, termList *vergleich);
+int istGleichesFormelElem(formelElem *elem, formelElem *vergleich);
 int istGleichesAtomElem(atomElem *elem, atomElem *vergleich);
 int istGleichesTermElem(termElem *elem, termElem *vergleich);
 int replaceVariableInFormelList(formelList *list, termElem *alt, termElem *neu);
@@ -80,5 +81,12 @@ int replaceVariableInTermListe(termList *list, termElem *alt, termElem *neu);
 formelList* getQueryFormeln(formelList *list);
 formelList* getNoQueryFormeln(formelList *list);
 atomList* getTrueAtoms(formelList *list);
-
+bodyElem* removeFromBodyElem(bodyElem *list, atomElem *elem);
+atomList* removeFromAtomList(atomList *list, atomElem *elem);
+formelList* removeFromFormelListe(formelList *list, formelElem *elem);
+termList* removeFromTermListe(termList *list, termElem *elem);
+atomElem** findAtomElemInFormel(formelElem* list, atomElem* elem);
+int SLDsatisfiable(formelElem *query, formelList *definite);
+int SETsatisfiable(formelList *query, formelList *definite);
+int isUnifiable(atomElem *elem, atomElem *vergleich);
 #endif

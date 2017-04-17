@@ -92,5 +92,12 @@ int main (int argc, char* argv[])
   trueAtoms = getTrueAtoms(noQueryFormeln);
   fprintf(TEXTOUT, "True Atoms:\n");
   printAtomListeShort(trueAtoms);
+  if(SETsatisfiable(queryFormeln, noQueryFormeln))
+  {
+    fprintf(TEXTOUT, "Satisfiable\n");
+  }else{
+    fprintf(TEXTOUT, "Not Satisfiable\n");
+
+  }
   return 0;
 }

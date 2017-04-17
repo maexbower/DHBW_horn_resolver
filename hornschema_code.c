@@ -738,5 +738,12 @@ int isUnifiable(atomElem *elem, atomElem *vergleich)
 {
   //Returns 0 when not unifiable and > 0 when unifiable
   //ToDo
+  if(strcmp(elem->praedikat, vergleich->praedikat) != 0)
+  {
+    return 0;
+  }else{
+    //ToDo
+    return 1;
+  }
   return 0;
 }

@@ -89,4 +89,5 @@ atomElem** findAtomElemInFormel(formelElem* list, atomElem* elem);
 int SLDsatisfiable(formelElem *query, formelList *definite);
 int SETsatisfiable(formelList *query, formelList *definite);
 int isUnifiable(atomElem *elem, atomElem *vergleich);
+int isTermUnifiable(termElem *elem, termElem *vergleich);
 #endif

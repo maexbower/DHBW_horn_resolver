@@ -484,7 +484,7 @@ char *yytext;
 #line 1 "hornschema.l"
 /* Find and add all integers and floats... */
 #line 6 "hornschema.l"
-  #include "hornschema_code.h"
+  #include "hornschema_datatypes.h"
   #include "hornschema.tab.h"
   int linecount;
 #line 491 "<stdout>"

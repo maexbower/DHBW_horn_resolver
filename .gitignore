@@ -1,6 +1,7 @@
 #Ignore all
 *
-
+satisfiable
+unsatisfiable
 #Do not Ignore Project Files
 !*.c 
 !*.h 

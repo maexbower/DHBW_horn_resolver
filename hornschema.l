@@ -3,7 +3,7 @@
 %option noyywrap
 
 %{
-  #include "hornschema_code.h"
+  #include "hornschema_datatypes.h"
   #include "hornschema.tab.h"
   int linecount;
 %}

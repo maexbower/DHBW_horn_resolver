@@ -1,4 +1,5 @@
 %{
+  #include "hornschema_datatypes.h"
   #include "hornschema_code.h"
   extern int yyerror(char*);
   extern int yylex(void);
@@ -79,25 +80,30 @@ int main (int argc, char* argv[])
   yyparse();
   fprintf(TEXTOUT, "Parse Abgeschlossen\n");
   printFormelListeShort(formlist);
+  fprintf(TEXTOUT, "-------------------\n");
   formelList *queryFormeln;
   formelList *noQueryFormeln;
-  atomList *trueAtoms;
+  //atomList *trueAtoms;
   queryFormeln = getQueryFormeln(formlist);
   fprintf(TEXTOUT, "Query Formeln:\n");
   printFormelListeShort(queryFormeln);
-
   noQueryFormeln = getNoQueryFormeln(formlist);
   fprintf(TEXTOUT, "No Query Formeln:\n");
   printFormelListeShort(noQueryFormeln);
-  trueAtoms = getTrueAtoms(noQueryFormeln);
-  fprintf(TEXTOUT, "True Atoms:\n");
-  printAtomListeShort(trueAtoms);
+  fprintf(TEXTOUT, "-------------------\n");
+  fprintf(TEXTOUT, "Start SETsatisfiable\n");
+  fprintf(TEXTOUT, "-------------------\n");
+
+  //trueAtoms = getTrueAtoms(noQueryFormeln);
+  //fprintf(TEXTOUT, "True Atoms:\n");
+  //printAtomListeShort(trueAtoms);
   if(SETsatisfiable(queryFormeln, noQueryFormeln))
   {
     fprintf(TEXTOUT, "Satisfiable\n");
+    return 0;
   }else{
     fprintf(TEXTOUT, "Not Satisfiable\n");
-
+    return 1;
   }
   return 0;
 }

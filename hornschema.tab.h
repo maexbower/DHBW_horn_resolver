@@ -64,7 +64,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "hornschema.y" /* yacc.c:1909  */
+#line 14 "hornschema.y" /* yacc.c:1909  */
 
     char* pra;
     char* funk;

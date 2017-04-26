@@ -64,6 +64,7 @@
 /* Copy the first part of user declarations.  */
 #line 1 "hornschema.y" /* yacc.c:339  */
 
+  #include "hornschema_datatypes.h"
   #include "hornschema_code.h"
   extern int yyerror(char*);
   extern int yylex(void);
@@ -71,7 +72,7 @@
   formelList *formlist;
 
 
-#line 75 "hornschema.tab.c" /* yacc.c:339  */
+#line 76 "hornschema.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -125,7 +126,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "hornschema.y" /* yacc.c:355  */
+#line 14 "hornschema.y" /* yacc.c:355  */
 
     char* pra;
     char* funk;
@@ -139,7 +140,7 @@ union YYSTYPE
     kopfElem *kopf;
     bodyElem *body;
 
-#line 143 "hornschema.tab.c" /* yacc.c:355  */
+#line 144 "hornschema.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -156,7 +157,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 160 "hornschema.tab.c" /* yacc.c:358  */
+#line 161 "hornschema.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -454,8 +455,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    45,    46,    47,    48,    49,    50,    51,
-      52,    53,    54,    55,    56,    57,    58,    59
+       0,    45,    45,    46,    47,    48,    49,    50,    51,    52,
+      53,    54,    55,    56,    57,    58,    59,    60
 };
 #endif
 
@@ -1239,103 +1240,103 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "hornschema.y" /* yacc.c:1646  */
+#line 45 "hornschema.y" /* yacc.c:1646  */
     {formlist = addToFormelListe(formlist, (yyvsp[-2].formel));}
-#line 1245 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1246 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 45 "hornschema.y" /* yacc.c:1646  */
+#line 46 "hornschema.y" /* yacc.c:1646  */
     {formlist = addToFormelListe(formlist, (yyvsp[0].formel));}
-#line 1251 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1252 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 46 "hornschema.y" /* yacc.c:1646  */
+#line 47 "hornschema.y" /* yacc.c:1646  */
     {formlist = addToFormelListe(formlist, (yyvsp[-1].formel));}
-#line 1257 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1258 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 47 "hornschema.y" /* yacc.c:1646  */
+#line 48 "hornschema.y" /* yacc.c:1646  */
     {}
-#line 1263 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1264 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 48 "hornschema.y" /* yacc.c:1646  */
+#line 49 "hornschema.y" /* yacc.c:1646  */
     {(yyval.term) = createTermElem((yyvsp[0].var), 0);}
-#line 1269 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1270 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 49 "hornschema.y" /* yacc.c:1646  */
+#line 50 "hornschema.y" /* yacc.c:1646  */
     {(yyval.term) = createTermElem((yyvsp[0].funk), 0);}
-#line 1275 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1276 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 50 "hornschema.y" /* yacc.c:1646  */
+#line 51 "hornschema.y" /* yacc.c:1646  */
     {(yyval.term) = createTermElem((yyvsp[-3].funk), (yyvsp[-1].termliste));}
-#line 1281 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1282 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 51 "hornschema.y" /* yacc.c:1646  */
+#line 52 "hornschema.y" /* yacc.c:1646  */
     {(yyval.termliste) = createTermListe((yyvsp[0].term));}
-#line 1287 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1288 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 52 "hornschema.y" /* yacc.c:1646  */
+#line 53 "hornschema.y" /* yacc.c:1646  */
     {(yyval.termliste) = addToTermListe((yyvsp[-2].termliste), (yyvsp[0].term));}
-#line 1293 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1294 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 53 "hornschema.y" /* yacc.c:1646  */
+#line 54 "hornschema.y" /* yacc.c:1646  */
     {(yyval.atom) = createAtomElem((yyvsp[-3].pra), (yyvsp[-1].termliste));}
-#line 1299 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1300 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 54 "hornschema.y" /* yacc.c:1646  */
+#line 55 "hornschema.y" /* yacc.c:1646  */
     {(yyval.formel) = createFormelElem((yyvsp[0].kopf), (yyvsp[-2].body));}
-#line 1305 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1306 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 55 "hornschema.y" /* yacc.c:1646  */
+#line 56 "hornschema.y" /* yacc.c:1646  */
     {(yyval.formel) = createFormelElem((yyvsp[0].kopf),createBodyElem(0));}
-#line 1311 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1312 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 56 "hornschema.y" /* yacc.c:1646  */
+#line 57 "hornschema.y" /* yacc.c:1646  */
     {(yyval.formel) = createFormelElem(createKopfElem(0),(yyvsp[-2].body));}
-#line 1317 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1318 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 57 "hornschema.y" /* yacc.c:1646  */
+#line 58 "hornschema.y" /* yacc.c:1646  */
     {(yyval.body) = createBodyElem(addToAtomListe(createAtomListe(),(yyvsp[0].atom)));}
-#line 1323 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1324 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 58 "hornschema.y" /* yacc.c:1646  */
+#line 59 "hornschema.y" /* yacc.c:1646  */
     {(yyval.body) = addToBodyElem((yyvsp[-2].body), (yyvsp[0].atom));}
-#line 1329 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1330 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 59 "hornschema.y" /* yacc.c:1646  */
+#line 60 "hornschema.y" /* yacc.c:1646  */
     {(yyval.kopf) = createKopfElem((yyvsp[0].atom));}
-#line 1335 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1336 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1339 "hornschema.tab.c" /* yacc.c:1646  */
+#line 1340 "hornschema.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1563,7 +1564,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 62 "hornschema.y" /* yacc.c:1906  */
+#line 63 "hornschema.y" /* yacc.c:1906  */
 
 
 int yyerror(char* err)
@@ -1584,25 +1585,30 @@ int main (int argc, char* argv[])
   yyparse();
   fprintf(TEXTOUT, "Parse Abgeschlossen\n");
   printFormelListeShort(formlist);
+  fprintf(TEXTOUT, "-------------------\n");
   formelList *queryFormeln;
   formelList *noQueryFormeln;
-  atomList *trueAtoms;
+  //atomList *trueAtoms;
   queryFormeln = getQueryFormeln(formlist);
   fprintf(TEXTOUT, "Query Formeln:\n");
   printFormelListeShort(queryFormeln);
-
   noQueryFormeln = getNoQueryFormeln(formlist);
   fprintf(TEXTOUT, "No Query Formeln:\n");
   printFormelListeShort(noQueryFormeln);
-  trueAtoms = getTrueAtoms(noQueryFormeln);
-  fprintf(TEXTOUT, "True Atoms:\n");
-  printAtomListeShort(trueAtoms);
+  fprintf(TEXTOUT, "-------------------\n");
+  fprintf(TEXTOUT, "Start SETsatisfiable\n");
+  fprintf(TEXTOUT, "-------------------\n");
+
+  //trueAtoms = getTrueAtoms(noQueryFormeln);
+  //fprintf(TEXTOUT, "True Atoms:\n");
+  //printAtomListeShort(trueAtoms);
   if(SETsatisfiable(queryFormeln, noQueryFormeln))
   {
     fprintf(TEXTOUT, "Satisfiable\n");
+    return 0;
   }else{
     fprintf(TEXTOUT, "Not Satisfiable\n");
-
+    return 1;
   }
   return 0;
 }

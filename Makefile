@@ -3,6 +3,9 @@ YACC = bison
 CC   = gcc -Wall
 LD   = gcc
 TMPFILES = *.out hornschemalex.c hornschemalex.o hornschema.tab.c hornschema.tab.h hornschema.tab.o lex.yy.c
+RED	 = '\033[0;31m'
+GREEN = '\033[0;32m'
+NC   = '\033[0m' # No Color
 all: hornschema
 clean:
 	rm $(TMPFILES)
@@ -49,9 +52,9 @@ test-s: hornschema
 		printf "Run Testfile $$f"									;\
 		./hornschema ./satisfiable/$$f >>/dev/null	;\
 		if [ $$? -eq 0 ]; then											\
-			printf "...Erfolgreich\n"								;\
+			printf "${GREEN}...Erfolgreich${NC}\n"								;\
 		else																			\
-			printf "...Fehlgeschlagen\n"						;\
+			printf "${RED}...Fehlgeschlagen${NC}\n"						;\
 		fi																				\
 		); done																		;\
 	}
@@ -62,9 +65,9 @@ test-u: hornschema
 		printf "Run Testfile $$f"									;\
 		./hornschema ./unsatisfiable/$$f >>/dev/null	;\
 		if [ $$? -ne 0 ]; then											\
-			printf "...Erfolgreich\n"								;\
+			printf "${GREEN}...Erfolgreich${NC}\n"								;\
 		else																			\
-			printf "...Fehlgeschlagen\n"						;\
+			printf "${RED}...Fehlgeschlagen${NC}\n"						;\
 		fi																				\
 		); done																		;\
 	}

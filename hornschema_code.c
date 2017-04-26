@@ -165,7 +165,13 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
 }
 int SETsatisfiable(formelList *query, formelList *definite)
 {
+  if(query->elem == 0)
+  {
+      //no query clause == satisfiable
+      return 1;
+  }
   formelList *tmp = query;
+
   do {
     if(SLDsatisfiable(tmp->elem, definite, 0))
     {

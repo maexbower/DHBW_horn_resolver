@@ -406,7 +406,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  17
+#define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  31
 
@@ -456,7 +456,7 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    45,    45,    46,    47,    48,    49,    50,    51,    52,
-      53,    54,    55,    56,    57,    58,    59,    60
+      53,    54,    55,    56,    57,    58,    59,    60,    61
 };
 #endif
 
@@ -507,9 +507,9 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,    15,     3,     0,     0,     0,
-       5,     1,     4,     0,     0,    17,    13,     6,     7,     9,
-       0,     2,    16,    14,    12,     0,    11,     0,     0,    10,
+       0,     0,    12,     0,     0,    16,     3,     0,     0,     0,
+       5,     1,     4,     0,     0,    18,    14,     6,     7,     9,
+       0,     2,    17,    15,    13,     0,    11,     0,     0,    10,
        8
 };
 
@@ -556,14 +556,14 @@ static const yytype_uint8 yystos[] =
 static const yytype_uint8 yyr1[] =
 {
        0,    14,    15,    15,    15,    15,    16,    16,    16,    17,
-      17,    18,    19,    19,    19,    20,    20,    21
+      17,    18,    18,    19,    19,    19,    20,    20,    21
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     1,     2,     2,     1,     1,     4,     1,
-       3,     4,     3,     3,     3,     1,     3,     1
+       3,     4,     1,     3,     3,     3,     1,     3,     1
 };
 
 
@@ -1301,42 +1301,48 @@ yyreduce:
 
   case 12:
 #line 55 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.formel) = createFormelElem((yyvsp[0].kopf), (yyvsp[-2].body));}
+    {(yyval.atom) = createAtomElem((yyvsp[0].pra), 0);}
 #line 1306 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 56 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.formel) = createFormelElem((yyvsp[0].kopf),createBodyElem(0));}
+    {(yyval.formel) = createFormelElem((yyvsp[0].kopf), (yyvsp[-2].body));}
 #line 1312 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 57 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.formel) = createFormelElem(createKopfElem(0),(yyvsp[-2].body));}
+    {(yyval.formel) = createFormelElem((yyvsp[0].kopf),createBodyElem(0));}
 #line 1318 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 58 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.body) = createBodyElem(addToAtomListe(createAtomListe(),(yyvsp[0].atom)));}
+    {(yyval.formel) = createFormelElem(createKopfElem(0),(yyvsp[-2].body));}
 #line 1324 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 59 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.body) = addToBodyElem((yyvsp[-2].body), (yyvsp[0].atom));}
+    {(yyval.body) = createBodyElem(addToAtomListe(createAtomListe(),(yyvsp[0].atom)));}
 #line 1330 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
 #line 60 "hornschema.y" /* yacc.c:1646  */
-    {(yyval.kopf) = createKopfElem((yyvsp[0].atom));}
+    {(yyval.body) = addToBodyElem((yyvsp[-2].body), (yyvsp[0].atom));}
 #line 1336 "hornschema.tab.c" /* yacc.c:1646  */
     break;
 
+  case 18:
+#line 61 "hornschema.y" /* yacc.c:1646  */
+    {(yyval.kopf) = createKopfElem((yyvsp[0].atom));}
+#line 1342 "hornschema.tab.c" /* yacc.c:1646  */
+    break;
 
-#line 1340 "hornschema.tab.c" /* yacc.c:1646  */
+
+#line 1346 "hornschema.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1564,7 +1570,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 63 "hornschema.y" /* yacc.c:1906  */
+#line 64 "hornschema.y" /* yacc.c:1906  */
 
 
 int yyerror(char* err)

@@ -44,6 +44,27 @@ forceall:
 run:
 	./hornschema pg-s-2
 test-s: hornschema
-	./hornschema pg-s-2
+	{ \
+	for f in $$(ls ./satisfiable); do ( 					\
+		printf "Run Testfile $$f"									;\
+		./hornschema ./satisfiable/$$f >>/dev/null	;\
+		if [ $$? -eq 0 ]; then											\
+			printf "...Erfolgreich\n"								;\
+		else																			\
+			printf "...Fehlgeschlagen\n"						;\
+		fi																				\
+		); done																		;\
+	}
+
 test-u: hornschema
-		./hornschema pg-u-2
+	{ \
+	for f in $$(ls ./unsatisfiable); do ( 					\
+		printf "Run Testfile $$f"									;\
+		./hornschema ./unsatisfiable/$$f >>/dev/null	;\
+		if [ $$? -ne 0 ]; then											\
+			printf "...Erfolgreich\n"								;\
+		else																			\
+			printf "...Fehlgeschlagen\n"						;\
+		fi																				\
+		); done																		;\
+	}

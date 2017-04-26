@@ -52,6 +52,7 @@ term: VARIABLE {$<term>$ = createTermElem($<var>1, 0);}
 params: term  {$<termliste>$ = createTermListe($<term>1);}
     | params KOMMA term  {$<termliste>$ = addToTermListe($<termliste>1, $<term>3);}
 atom: PRAEDIKAT KLAMMERAUF params KLAMMERZU {$<atom>$ = createAtomElem($<pra>1, $<termliste>3);}
+    | PRAEDIKAT {$<atom>$ = createAtomElem($<pra>1, 0);}
 formel: body ARROW head {$<formel>$ = createFormelElem($<kopf>3, $<body>1);}
     | TRUE ARROW head {$<formel>$ = createFormelElem($<kopf>3,createBodyElem(0));}
     | body ARROW FALSE  {$<formel>$ = createFormelElem(createKopfElem(0),$<body>1);}

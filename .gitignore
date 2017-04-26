@@ -1,13 +1,16 @@
 #Ignore all
 *
-satisfiable
-unsatisfiable
+
 #Do not Ignore Project Files
-!*.c 
-!*.h 
-!*.l 
-!*.y 
-!.gitignore 
-!*.md 
-!Makefile 
+!*.c
+!*.h
+!*.l
+!*.y
+!.gitignore
+!*.md
+!Makefile
 !LICENSE
+!satisfiable
+!unsatisfiable
+!satisfiable/*
+!unsatisfiable/*

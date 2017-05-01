@@ -1,28 +1,28 @@
 LEX  = flex
 YACC = bison
-CC   = gcc -Wall
+CC   = gcc
 LD   = gcc
-TMPFILES = *.out hornschemalex.c hornschemalex.o hornschema.tab.c hornschema.tab.h hornschema.tab.o lex.yy.c hornschema_datatypes.o hornschema_code.o
+TMPFILES = *.out *.o *.exe hornschemalex.c hornschemalex.o hornschema.tab.c hornschema.tab.h hornschema.tab.o lex.yy.c hornschema_datatypes.o hornschema_code.o
 RED	 = '\033[0;31m'
 GREEN = '\033[0;32m'
-NC   = '\033[0m' # No Color
+NC   = '\033[0m'
 EXECBASE = hornschema
 WINEXEC = ${EXECBASE}.exe
 
 ifeq ($(OS),Windows_NT)
 	#Windows stuff
-	EXEC=${WINEXEC}
+	EXEC = ${WINEXEC}
 else
 	#Linux stuff
-	EXEC=${EXECBASE}
+	EXEC = ${EXECBASE}
 endif
 
 all: $(EXEC)
 
-hornschemalex.c: hornschema.l hornschema.tab.h hornschema_datatypes.h
+hornschemalex.c: hornschema.l hornschema.tab.h hornschema_datatypes.h hornschema_datatypes.o
 	$(LEX) -t hornschema.l > hornschemalex.c
 
-hornschema.tab.h: hornschema.y hornschema_datatypes.h hornschema_code.h
+hornschema.tab.h: hornschema.y hornschema_datatypes.h hornschema_code.h hornschema_code.o hornschema_datatypes.o
 	$(YACC) -d hornschema.y
 
 hornschema.tab.c: hornschema.y hornschema_datatypes.h hornschema_code.h
@@ -40,18 +40,17 @@ hornschema_code.o:  hornschema_code.c hornschema_code.h hornschema_datatypes.h
 hornschema_datatypes.o: hornschema_datatypes.c hornschema_datatypes.h
 	$(CC) -c -o hornschema_datatypes.o hornschema_datatypes.c
 
-$(EXEC): hornschemalex.o hornschema.tab.o hornschema.o hornschema_datatypes.o hornschema_code.o
+$(EXEC): hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o
 	$(LD) hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o $(EXEC)
 
 forceall:
+	$(CC) -c -o hornschema_code.o hornschema_code.c
+	$(CC) -c -o hornschema_datatypes.o hornschema_datatypes.c
 	$(YACC) -d hornschema.y
 	$(LEX) -t hornschema.l > hornschemalex.c
-	$(YACC) -d hornschema.y
-	$(CC) -c -o hornschema_datatypes.o hornschema_datatypes.c
-	$(CC) -c -o hornschema.o hornschema_code.c
-	$(CC) -c -o hornschema.tab.o hornschema.tab.c
 	$(CC) -c -o hornschemalex.o hornschemalex.c
-	$(LD)  hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o hornschema
+	$(CC) -c -o hornschema.tab.o hornschema.tab.c
+	$(LD) hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o $(EXEC)
 
 run:
 	./$(EXEC) pg-s-2
@@ -82,4 +81,3 @@ test-u: $(EXEC)
 	}
 clean:
 	rm -f $(TMPFILES) ${EXECBASE} ${WINEXEC}
-

@@ -15,4 +15,6 @@ int isTermUnifiable(termElem *elem, termElem *vergleich);
 unifikatorElem* unify(atomElem *elem, atomElem *vergleich);
 int isQueryEmpty(formelElem *query);
 formelList* getUnifiableFormels(atomElem *l1, formelList *definite);
+int istVariable(termElem *elem);
+int istEchterSubterm(termElem *elem, termElem *vergleich);
 #endif

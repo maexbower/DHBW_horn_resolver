@@ -764,7 +764,7 @@ formelElem* copyFormelElem(formelElem* elem)
   }
   return 0;
 }
-unifikatorElem* createUnifikator(atomElem *elem, atomElem *wirdzu)
+unifikatorElem* createUnifikator(termElem *elem, termElem *wirdzu)
 {
   if(elem && wirdzu)
   {
@@ -782,14 +782,14 @@ void printUnifikator(unifikatorElem *elem)
     fprintf(TEXTOUT, "Unifikator: ");
     if(elem->elem)
     {
-      printAtomElemShort(elem->elem);
+      printTermElemShort(elem->elem);
     }else{
       fprintf(TEXTOUT, "(nil)");
     }
     fprintf(TEXTOUT, " -> ");
     if(elem->wirdzu)
     {
-      printAtomElemShort(elem->wirdzu);
+      printTermElemShort(elem->wirdzu);
     }else{
       fprintf(TEXTOUT, "(nil)");
     }

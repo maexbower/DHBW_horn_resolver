@@ -213,6 +213,48 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
         if(elem->argument && vergleich ->argument)
         {
 
+
+            termList *tmpElemArg = elem->argument;
+            termList *tmpVergArg = vergleich->argument;
+            do{
+              if(istGleichesTermElem(tmpElemArg->elem, tmpVergArg->elem) == 0)
+              {
+                  if(istVariable(tmpElemArg->elem) || istVariable(tmpVergArg->elem))
+                  {
+                    //sei x die Variable, y der andere Term
+                    //if x ist echter Subterm von y then
+                    //return nicht unifizierbar
+                    //else
+                    //σ := σ · ([x/y])
+                      if(istVariable(tmpElemArg->elem))
+                      {
+                        //Ist das erste die Variable?
+                        if(istEchterSubterm(tmpElemArg->elem, tmpVergArg->elem))
+                        {
+                          return 0;
+                        }else{
+                          unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpVergArg->elem), copyTermElem(tmpElemArg->elem));
+                          return unifikator;
+                        }
+                      }else{
+                        //Die zweite ist die Variable.
+                        if(istEchterSubterm(tmpVergArg->elem, tmpElemArg->elem))
+                        {
+                          return 0;
+                        }else{
+                          unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpElemArg->elem), copyTermElem(tmpVergArg->elem));
+                          return unifikator;
+                        }
+                      }
+                  }else{
+                    //else if weder σ(s)|i noch σ(t)|i ist Variable then
+                    //return nicht unifizierbar
+                    return 0;
+                  }
+              }
+              tmpElemArg = tmpElemArg->next;
+              tmpVergArg = tmpVergArg->next;
+            }while(tmpElemArg && tmpVergArg);
         }else{
           return 0;
         }
@@ -262,4 +304,37 @@ formelList* getUnifiableFormels(atomElem *l1, formelList *definite)
     } while(definite);
   }
   return unifiableFormeln;
+}
+int istVariable(termElem *elem)
+{
+  if(elem)
+  {
+    if(('n' <= elem->name[0]) && ('z' >= elem->name[0]))
+    {
+      return 1;
+    }else{
+      return 0;
+    }
+  }else{
+    return 0;
+  }
+}
+int istEchterSubterm(termElem *elem, termElem *vergleich)
+{
+  if(strcmp(elem->name, vergleich->name))
+  {
+    return 1;
+  }
+  if(vergleich->argument)
+  {
+    termList *tmpVergleich = vergleich->argument;
+    do{
+      if(istEchterSubterm(elem, tmpVergleich->elem))
+      {
+        return 1;
+      }
+      tmpVergleich = tmpVergleich->next;
+    }while(tmpVergleich);
+  }
+  return 0;
 }

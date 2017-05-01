@@ -2,13 +2,22 @@ LEX  = flex
 YACC = bison
 CC   = gcc -Wall
 LD   = gcc
-TMPFILES = *.out hornschemalex.c hornschemalex.o hornschema.tab.c hornschema.tab.h hornschema.tab.o lex.yy.c
+TMPFILES = *.out hornschemalex.c hornschemalex.o hornschema.tab.c hornschema.tab.h hornschema.tab.o lex.yy.c hornschema_datatypes.o hornschema_code.o
 RED	 = '\033[0;31m'
 GREEN = '\033[0;32m'
 NC   = '\033[0m' # No Color
-all: hornschema
-clean:
-	rm $(TMPFILES)
+EXECBASE = hornschema
+WINEXEC = ${EXECBASE}.exe
+
+ifeq ($(OS),Windows_NT)
+	#Windows stuff
+	EXEC=${WINEXEC}
+else
+	#Linux stuff
+	EXEC=${EXECBASE}
+endif
+
+all: $(EXEC)
 
 hornschemalex.c: hornschema.l hornschema.tab.h hornschema_datatypes.h
 	$(LEX) -t hornschema.l > hornschemalex.c
@@ -31,8 +40,8 @@ hornschema_code.o:  hornschema_code.c hornschema_code.h hornschema_datatypes.h
 hornschema_datatypes.o: hornschema_datatypes.c hornschema_datatypes.h
 	$(CC) -c -o hornschema_datatypes.o hornschema_datatypes.c
 
-hornschema: hornschemalex.o hornschema.tab.o hornschema.o hornschema_datatypes.o hornschema_code.o
-	$(LD) hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o hornschema
+$(EXEC): hornschemalex.o hornschema.tab.o hornschema.o hornschema_datatypes.o hornschema_code.o
+	$(LD) hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o $(EXEC)
 
 forceall:
 	$(YACC) -d hornschema.y
@@ -45,12 +54,12 @@ forceall:
 	$(LD)  hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o hornschema
 
 run:
-	./hornschema pg-s-2
-test-s: hornschema
+	./$(EXEC) pg-s-2
+test-s: $(EXEC)
 	{ \
 	for f in $$(ls ./satisfiable); do ( 					\
 		printf "Run Testfile $$f"									;\
-		./hornschema ./satisfiable/$$f >>/dev/null	;\
+		./$(EXEC) ./satisfiable/$$f >>/dev/null	;\
 		if [ $$? -eq 0 ]; then											\
 			printf "${GREEN}...Erfolgreich${NC}\n"								;\
 		else																			\
@@ -59,11 +68,11 @@ test-s: hornschema
 		); done																		;\
 	}
 
-test-u: hornschema
+test-u: $(EXEC)
 	{ \
 	for f in $$(ls ./unsatisfiable); do ( 					\
 		printf "Run Testfile $$f"									;\
-		./hornschema ./unsatisfiable/$$f >>/dev/null	;\
+		./$(EXEC) ./unsatisfiable/$$f >>/dev/null	;\
 		if [ $$? -ne 0 ]; then											\
 			printf "${GREEN}...Erfolgreich${NC}\n"								;\
 		else																			\
@@ -71,3 +80,6 @@ test-u: hornschema
 		fi																				\
 		); done																		;\
 	}
+clean:
+	rm -f $(TMPFILES) ${EXECBASE} ${WINEXEC}
+

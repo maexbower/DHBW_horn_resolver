@@ -38,8 +38,8 @@ typedef struct kopfElem {
   struct atomElem *atom;
 } kopfElem, *ptrKopf;
 typedef struct unifikator {
-  struct atomElem *elem;
-  struct atomElem *wirdzu;
+  struct termElem *elem;
+  struct termElem *wirdzu;
 } unifikatorElem, *ptrUnifikator;
 
 termElem* createTermElem(char* pname, termList *termlist);
@@ -50,7 +50,7 @@ atomList* createAtomListe();
 formelList* createFormelListe();
 kopfElem* createKopfElem(atomElem *kopf);
 bodyElem* createBodyElem(atomList *body);
-unifikatorElem* createUnifikator(atomElem *elem, atomElem *wirdzu);
+unifikatorElem* createUnifikator(termElem *elem, termElem *wirdzu);
 bodyElem* addToBodyElem(bodyElem *list, atomElem *elem);
 formelList* addToFormelListe(formelList *list, formelElem *elem);
 atomList* addToAtomListe(atomList *list, atomElem *elem);

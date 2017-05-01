@@ -553,6 +553,7 @@ int replaceVariableInAtomList(atomList *list, termElem *alt, termElem *neu)
 }
 int replaceVariableInAtomElem(atomElem *elem, termElem *alt, termElem *neu)
 {
+
   if(elem->argument)
   {
     return replaceVariableInTermListe(elem->argument, alt, neu);
@@ -708,6 +709,24 @@ termList* copyTermList(termList* list)
   }
   return 0;
 }
+formelList* copyFormelList(formelList* list)
+{
+  if(list)
+  {
+    //fprintf(TEXTOUT, "copy TermList: %p - elem:%p - next:%p\n",list, list->elem, list->next );
+    formelList *newList = createFormelListe(0);
+    if(list->elem)
+    {
+      newList->elem = copyFormelElem(list->elem);
+    }
+    if(list->next)
+    {
+      newList->next = copyFormelList(list->next);
+    }
+    return newList;
+  }
+  return 0;
+}
 termElem* copyTermElem(termElem* elem)
 {
   if(elem)
@@ -795,4 +814,19 @@ void printUnifikator(unifikatorElem *elem)
     }
     fprintf(TEXTOUT,"\n");
   }
+}
+char* addLineCountToVariable(char* name, int linecount)
+{
+  int stellenDerZahl = 1;
+  int zehnerpotenz = 10;
+  while((linecount-zehnerpotenz) > 0)
+  {
+    stellenDerZahl++;
+    zehnerpotenz*=10;
+  }
+  char *text = malloc((sizeof(name)/sizeof(name[0]))+1+stellenDerZahl+1);
+  //fprintf(TEXTOUT, "Größe des alten Strings: %d\n", (int)(sizeof(name)/sizeof(name[0])));
+  sprintf(text, "%s_%d", name, linecount);
+  //fprintf(TEXTOUT, "Größe des neuen Strings: %d\n", (int)(sizeof(text)/sizeof(text[0])));
+  return text;
 }

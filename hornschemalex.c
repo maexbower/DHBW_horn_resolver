@@ -783,57 +783,60 @@ case 3:
 YY_RULE_SETUP
 #line 25 "hornschema.l"
 {
-  sprintf(yylval.var,"%s_%d", strdup(yytext), linecount);
+  yylval.var = addLineCountToVariable(strdup(yytext), linecount);
+  /*fprintf(TEXTOUT, "Variable gefunden: %s\n", yylval.var);*/
   return VARIABLE;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 29 "hornschema.l"
+#line 30 "hornschema.l"
 {
   yylval.funk = strdup(yytext);
+  /*fprintf(TEXTOUT, "Funktion gefunden: %s\n", yylval.funk);*/
  return FUNKTION;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 33 "hornschema.l"
+#line 35 "hornschema.l"
 {
   yylval.pra = strdup(yytext);
+  /*fprintf(TEXTOUT, "Praedikat gefunden: %s\n", yylval.pra);*/
  return PRAEDIKAT;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 37 "hornschema.l"
+#line 40 "hornschema.l"
 {
  return AND;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 40 "hornschema.l"
+#line 43 "hornschema.l"
 {
  return ARROW;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 43 "hornschema.l"
+#line 46 "hornschema.l"
 {
  return KLAMMERAUF;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 46 "hornschema.l"
+#line 49 "hornschema.l"
 {
  return KLAMMERZU;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 49 "hornschema.l"
+#line 52 "hornschema.l"
 {
  return KOMMA;
 }
@@ -841,7 +844,7 @@ YY_RULE_SETUP
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 53 "hornschema.l"
+#line 56 "hornschema.l"
 {
   linecount++;
  return NEWLINE;
@@ -849,17 +852,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 57 "hornschema.l"
+#line 60 "hornschema.l"
 {
 
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 60 "hornschema.l"
+#line 63 "hornschema.l"
 ECHO;
 	YY_BREAK
-#line 863 "<stdout>"
+#line 866 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1860,7 +1863,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 60 "hornschema.l"
+#line 63 "hornschema.l"
 
 
 

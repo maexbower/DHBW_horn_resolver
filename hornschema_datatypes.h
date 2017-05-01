@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 typedef struct termElem {
     char* name;
     struct termList *argument;
@@ -95,5 +94,6 @@ termElem* copyTermElem(termElem* elem);
 bodyElem* copyBodyElem(bodyElem* elem);
 kopfElem* copyKopfElem(kopfElem* elem);
 formelElem* copyFormelElem(formelElem* elem);
-
+formelList* copyFormelList(formelList* list);
+char* addLineCountToVariable(char* name, int linecount);
 #endif

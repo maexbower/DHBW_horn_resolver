@@ -20,3 +20,4 @@
 hornschemalex.c
 hornschema.tab.c
 hornschema.tab.h
+hornschema.h

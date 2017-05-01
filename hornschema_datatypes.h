@@ -77,6 +77,7 @@ int istGleichesFormelElem(formelElem *elem, formelElem *vergleich);
 int istGleichesAtomElem(atomElem *elem, atomElem *vergleich);
 int istGleichesTermElem(termElem *elem, termElem *vergleich);
 int replaceVariableInFormelList(formelList *list, termElem *alt, termElem *neu);
+int replaceVariableInFormelElem(formelElem *elem, termElem *alt, termElem *neu);
 int replaceVariableInKopf(kopfElem *kopf, termElem *alt, termElem *neu);
 int replaceVariableInBody(bodyElem *body, termElem *alt, termElem *neu);
 int replaceVariableInAtomList(atomList *list, termElem *alt, termElem *neu);

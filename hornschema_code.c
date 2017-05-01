@@ -81,18 +81,57 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
     fprintf(TEXTOUT, "0 Abbruch keine definiten\n");
     return 0;
   }
-  //else let query = {l1 , l2 , ... , ln}
-  atomElem *l1 = query->body->atomlist->elem;
-  //fprintf(TEXTOUT, "l1: %p\n", l1);
-  //let C be the Elements of D whose head is unifiable with l1
-  formelList *unifiableFormeln = getUnifiableFormels(l1, definite);
-
   fprintf(TEXTOUT, "Definite Formeln\n");
   printFormelListeShort(definite);
   fprintf(TEXTOUT, "\n");
   fprintf(TEXTOUT, "Query Formeln\n");
   printFormelElemShort(query);
   fprintf(TEXTOUT, "\n");
+  //else let query = {l1 , l2 , ... , ln}
+  atomElem *l1 = query->body->atomlist->elem;
+  //fprintf(TEXTOUT, "l1: %p\n", l1);
+  //let C be the Elements of D whose head is unifiable with l1
+  formelList *unifiableFormeln = getUnifiableFormels(l1, definite);
+  if(0 == unifiableFormeln->elem)
+  {
+    formelList *tmpDefinite = definite;
+    do{
+      //Wenn das Atom nicht komplett gleich ist prüfe auf Unifizierbarkeit
+      unifikatorElem *unifikator = unify(l1, tmpDefinite->elem->kopf->atom);
+      if(unifikator)
+      {
+
+        fprintf(TEXTOUT, "\n");
+        fprintf(TEXTOUT, "Unifikator gefunden: ");
+        printUnifikator(unifikator);
+        fprintf(TEXTOUT, "\n");
+        formelList *unifiedDefinite = copyFormelList(definite);
+        fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in den Definiten Formeln ersetzt.\n", replaceVariableInFormelList(unifiedDefinite, unifikator->elem, unifikator->wirdzu));
+        printFormelListeShort(unifiedDefinite);
+        formelElem *unifiedQuery = copyFormelElem(query);
+        fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in Query ersetzt.\n", replaceVariableInFormelElem(unifiedQuery, unifikator->elem, unifikator->wirdzu));
+        printFormelElemShort(unifiedQuery);
+        fprintf(TEXTOUT, "\n");
+        if(SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe) == 0)
+        {
+          return 0;
+        }
+      }else{
+        fprintf(TEXTOUT, "kein Unifikator für ");
+        printAtomElemShort(l1);
+        fprintf(TEXTOUT, " und ");
+        printAtomElemShort(definite->elem->kopf->atom);
+        fprintf(TEXTOUT, " gefunden\n");
+      }
+      tmpDefinite = tmpDefinite->next;
+    } while(tmpDefinite);
+
+
+  }
+
+
+
+
   fprintf(TEXTOUT, "Unifizierbare Formeln\n");
   printFormelListeShort(unifiableFormeln);
 
@@ -319,38 +358,6 @@ formelList* getUnifiableFormels(atomElem *l1, formelList *definite)
       if(isUnifiable(l1, tmpDefinite->elem->kopf->atom))
       {
         unifiableFormeln = addToFormelListe(unifiableFormeln, copyFormelElem(tmpDefinite->elem));
-      }else{
-        //Wenn das Atom nicht komplett gleich ist prüfe auf Unifizierbarkeit
-        unifikatorElem *unifikator = unify(l1, tmpDefinite->elem->kopf->atom);
-        if(unifikator)
-        {
-
-          fprintf(TEXTOUT, "\n");
-          fprintf(TEXTOUT, "Unifikator gefunden: ");
-          printUnifikator(unifikator);
-          fprintf(TEXTOUT, "\n");
-          formelList *unifiedDefinite = copyFormelList(definite);
-          fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in den Definiten Formeln ersetzt.\n", replaceVariableInFormelList(unifiedDefinite, unifikator->elem, unifikator->wirdzu));
-          printFormelListeShort(unifiedDefinite);
-          atomElem *unifiedL1 = copyAtomElem(l1);
-          fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in L1 ersetzt.\n", replaceVariableInAtomElem(unifiedL1, unifikator->elem, unifikator->wirdzu));
-          printAtomElemShort(unifiedL1);
-          fprintf(TEXTOUT, "\n");
-          formelList *newUnifiable = getUnifiableFormels(unifiedL1, unifiedDefinite);
-          fprintf(TEXTOUT, "\nNach dem Unifizieren sind folgende Unifikationen möglich: \n");
-          printFormelListeShort(newUnifiable);
-          fprintf(TEXTOUT, "\n");
-          if(newUnifiable)
-          {
-            return newUnifiable;
-          }
-        }else{
-          fprintf(TEXTOUT, "kein Unifikator für ");
-          printAtomElemShort(l1);
-          fprintf(TEXTOUT, " und ");
-          printAtomElemShort(definite->elem->kopf->atom);
-          fprintf(TEXTOUT, " gefunden\n");
-        }
       }
       tmpDefinite = tmpDefinite->next;
     } while(tmpDefinite);

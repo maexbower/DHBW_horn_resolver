@@ -519,11 +519,23 @@ int replaceVariableInFormelList(formelList *list, termElem *alt, termElem *neu)
     int returnval = 0;
     if(list)
     {
-      returnval += replaceVariableInKopf(list->elem->kopf, alt, neu);
-      returnval += replaceVariableInBody(list->elem->body, alt, neu);
+      if(list->elem)
+      {
+        returnval += replaceVariableInFormelElem(list->elem, alt, neu);
+      }
       returnval += replaceVariableInFormelList(list->next, alt, neu);
     }
     return returnval;
+}
+int replaceVariableInFormelElem(formelElem *elem, termElem *alt, termElem *neu)
+{
+  int returnval = 0;
+  if(elem)
+  {
+    returnval += replaceVariableInKopf(elem->kopf, alt, neu);
+    returnval += replaceVariableInBody(elem->body, alt, neu);
+  }
+  return returnval;
 }
 int replaceVariableInKopf(kopfElem *kopf, termElem *alt, termElem *neu)
 {

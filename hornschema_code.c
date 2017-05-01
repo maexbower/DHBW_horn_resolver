@@ -63,6 +63,8 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
 {
   fprintf(TEXTOUT, "\n");
   fprintf(TEXTOUT, "---------------------\n");
+  fprintf(TEXTOUT, "SLD Satisfiable\n");
+  fprintf(TEXTOUT, "---------------------\n");
   //Returns 0 when unsatisfiable and >0 when satisfiable
   //if query == [] then return unsatisfiable
   tiefe++;
@@ -94,6 +96,7 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
   formelList *unifiableFormeln = getUnifiableFormels(l1, definite);
   if(0 == unifiableFormeln->elem)
   {
+    fprintf(TEXTOUT, "Keine syntaktische Gleichheit...Suche Unifikator:\n");
     formelList *tmpDefinite = definite;
     do{
       //Wenn das Atom nicht komplett gleich ist prüfe auf Unifizierbarkeit
@@ -101,7 +104,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
       if(unifikator)
       {
 
-        fprintf(TEXTOUT, "\n");
         fprintf(TEXTOUT, "Unifikator gefunden: ");
         printUnifikator(unifikator);
         fprintf(TEXTOUT, "\n");
@@ -111,7 +113,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
         formelElem *unifiedQuery = copyFormelElem(query);
         fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in Query ersetzt.\n", replaceVariableInFormelElem(unifiedQuery, unifikator->elem, unifikator->wirdzu));
         printFormelElemShort(unifiedQuery);
-        fprintf(TEXTOUT, "\n");
         if(SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe) == 0)
         {
           return 0;
@@ -129,10 +130,7 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
 
   }
 
-
-
-
-  fprintf(TEXTOUT, "Unifizierbare Formeln\n");
+  fprintf(TEXTOUT, "syntaktische Gleichheit...Unifizierbare Formeln:\n");
   printFormelListeShort(unifiableFormeln);
 
   //for all c e C do

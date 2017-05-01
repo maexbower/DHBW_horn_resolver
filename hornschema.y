@@ -79,29 +79,30 @@ int main (int argc, char* argv[])
 		yyin = stdin;
 	}
   yyparse();
+  formelList *queryFormeln;
+  formelList *definiteFormeln;
+  fprintf(TEXTOUT, "-------------------\n");
   fprintf(TEXTOUT, "Parse Abgeschlossen\n");
   printFormelListeShort(formlist);
   fprintf(TEXTOUT, "-------------------\n");
-  formelList *queryFormeln;
-  formelList *noQueryFormeln;
-  //atomList *trueAtoms;
   queryFormeln = getQueryFormeln(formlist);
   fprintf(TEXTOUT, "Query Formeln:\n");
   printFormelListeShort(queryFormeln);
-  noQueryFormeln = getNoQueryFormeln(formlist);
-  fprintf(TEXTOUT, "No Query Formeln:\n");
-  printFormelListeShort(noQueryFormeln);
+  definiteFormeln = getDefiniteFormeln(formlist);
+  fprintf(TEXTOUT, "Definite Formeln:\n");
+  printFormelListeShort(definiteFormeln);
   fprintf(TEXTOUT, "-------------------\n");
   fprintf(TEXTOUT, "Start SETsatisfiable\n");
   fprintf(TEXTOUT, "-------------------\n");
-
-  //trueAtoms = getTrueAtoms(noQueryFormeln);
-  //fprintf(TEXTOUT, "True Atoms:\n");
-  //printAtomListeShort(trueAtoms);
-  if(SETsatisfiable(queryFormeln, noQueryFormeln))
+  int sldreturn = SETsatisfiable(queryFormeln, definiteFormeln);
+  if(sldreturn == 1)
   {
     fprintf(TEXTOUT, "Satisfiable\n");
     return 0;
+  }else if(sldreturn == 2)
+  {
+    fprintf(TEXTOUT, "Not Decidable\n");
+    return 2;
   }else{
     fprintf(TEXTOUT, "Not Satisfiable\n");
     return 1;

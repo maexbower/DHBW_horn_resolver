@@ -5,9 +5,7 @@
 
 
 formelList* getQueryFormeln(formelList *list);
-formelList* getNoQueryFormeln(formelList *list);
-atomList* getTrueAtoms(formelList *list);
-
+formelList* getDefiniteFormeln(formelList *list);
 int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe);
 int SETsatisfiable(formelList *query, formelList *definite);
 int isUnifiable(atomElem *elem, atomElem *vergleich);

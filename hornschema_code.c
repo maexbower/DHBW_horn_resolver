@@ -1,7 +1,11 @@
 #include "hornschema_datatypes.h"
 #include "hornschema_code.h"
 
-
+/* Funktion: getQueryFormeln
+ * Parameter: formelList *list
+ * Returns: formelList* liste aller querry Formeln
+ * Beschreibung: geht durch die gegebenen Formeln und gibt alle mit leerem Kopf Element (query Formeln) zurück.
+ */
 formelList* getQueryFormeln(formelList *list)
 {
     formelList *newList = createFormelListe();
@@ -20,7 +24,12 @@ formelList* getQueryFormeln(formelList *list)
     }
     return newList;
 }
-formelList* getNoQueryFormeln(formelList *list)
+/* Funktion: getDefiniteFormeln
+ * Parameter: formelList *list
+ * Returns: formelList* Liste aller definiten Formeln
+ * Beschreibung: geht durch die gegebene Liste an Formeln und gibt die definiten Formeln zurück
+ */
+formelList* getDefiniteFormeln(formelList *list)
 {
     formelList *newList = createFormelListe();
     formelList *tmp = list;
@@ -38,27 +47,14 @@ formelList* getNoQueryFormeln(formelList *list)
     }
     return newList;
 }
-atomList* getTrueAtoms(formelList *list)
-{
-  atomList *newList = createAtomListe();
-  formelList *tmp = list;
-  while(tmp)
-  {
-    if(tmp->elem)
-    {
-      if(tmp->elem->body)
-      {
-        if(tmp->elem->body->atomlist == 0)
-        {
-          newList = addToAtomListe(newList, tmp->elem->kopf->atom);
-        }
-      }
-    }
-    tmp = tmp->next;
-  }
-  return newList;
-}
-
+/* Funktion: SLDsatisfiable
+ * Parameter: formelElem *query, formelList *definite, int tiefe
+ * Returns: 0 wenn nicht Erfüllbar, 1 wenn Erfüllbar
+ * Beschreibung: Geht bis zu einer bestimmten Tiefe durch die Formeln und versucht diese zu Unifizieren.
+ *               Wird durch unifizierung die Formel true->false erzeugt ist die Resolution unerfüllbar
+ *               Wird die maximale Tiefe überschritten ist das Problem nicht entscheidbar
+ *               Sind keine Unifizierbaren Formeln in dem Set mehr vorhanden gilt das Set als Erfüllbar
+ */
 int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
 {
   fprintf(TEXTOUT, "\n");
@@ -80,7 +76,7 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
   }
   if(!definite)
   {
-    fprintf(TEXTOUT, "0 Abbruch keine definiten\n");
+    fprintf(TEXTOUT, "0 Abbruch keine definiten Formeln\n");
     return 0;
   }
   fprintf(TEXTOUT, "Definite Formeln\n");
@@ -113,9 +109,13 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
         formelElem *unifiedQuery = copyFormelElem(query);
         fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in Query ersetzt.\n", replaceVariableInFormelElem(unifiedQuery, unifikator->elem, unifikator->wirdzu));
         printFormelElemShort(unifiedQuery);
-        if(SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe) == 0)
+        int sldreturn = SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe);
+        if(sldreturn == 0)
         {
           return 0;
+        }else if(sldreturn == 2)
+        {
+          return 2;
         }
       }else{
         fprintf(TEXTOUT, "kein Unifikator für ");
@@ -155,7 +155,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
         //Wenn die Query keine weiteren Literale hat wird hier eine leere AtomListe erzeugt.
         newBodyAtomList = createAtomListe(0);
       }
-      //fprintf(TEXTOUT, "newBody: %p\n", newBody);
       //hole die Liste der Atome aus der unifizierbaren Formel.
       atomList *tmpAtomList;
       if(tmpUnifiableFormels->elem)
@@ -169,7 +168,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
       }else{
         tmpAtomList = 0;
       }
-      //fprintf(TEXTOUT, "tmpAtomList: %p\n", tmpAtomList);
       //Sofern in der unifizierbaren Formel eine Atomliste gefunden wurde (!= "true =>")
       while(tmpAtomList)
       {
@@ -183,8 +181,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
       {
         newQuery = createFormelElem(createKopfElem(0), createBodyElem(newBodyAtomList));
       }
-      //fprintf(TEXTOUT, "newQuery: %p\n", newQuery);
-
       //   if SLDsatisfiable(query_new, D) then return satisfiable
         if(SLDsatisfiable(newQuery, definite, tiefe) == 0)
         {
@@ -193,8 +189,6 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
         }
         //return unsatisfiable
 
-
-      //fprintf(TEXTOUT, "tmpUnifiableFormels->next: %p\n", tmpUnifiableFormels->next);
       tmpUnifiableFormels = tmpUnifiableFormels->next;
     }
     fprintf(TEXTOUT, "1 Abbruch keine war unsatisfiable\n");
@@ -202,6 +196,12 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
     fprintf(TEXTOUT, "---------------------\n");
     return 1;
 }
+/* Funktion: SETsatisfiable
+ * Parameter: formelList *query, formelList *definite
+ * Returns: 0 wenn nicht Erfüllbar, 1 wenn Erfüllbar
+ * Beschreibung: wendet alle Query Formeln nacheinander auf die Definiten Formeln an. Sobald eine Query eine "Erfüllbarkeit" verursacht, wird abgebrochen.
+ *               Sind alle Query Formeln "nicht Erfüllbar" wird dies zurüchgegeben.
+ */
 int SETsatisfiable(formelList *query, formelList *definite)
 {
   if(query->elem == 0)
@@ -212,9 +212,13 @@ int SETsatisfiable(formelList *query, formelList *definite)
   formelList *tmp = query;
 
   do {
-    if(SLDsatisfiable(tmp->elem, definite, 0))
+    int sldreturn = SLDsatisfiable(tmp->elem, definite, 0);
+    if(sldreturn == 1)
     {
       return 1;
+    }else if(sldreturn == 2)
+    {
+      return 2;
     }
     if(tmp->next)
     {
@@ -223,15 +227,16 @@ int SETsatisfiable(formelList *query, formelList *definite)
   } while(tmp->next);
   return 0;
 }
+/* Funktion: isUnifiable
+ * Parameter: atomElem *elem, atomElem *vergleich
+ * Returns: 0 wenn Falsch, 1 wenn Wahr
+ * Beschreibung: prüft beide Atom Elemente auf syntaktische Gleichheit.
+ */
 int isUnifiable(atomElem *elem, atomElem *vergleich)
 {
   //Returns 0 when not unifiable and > 0 when unifiable
   //Ohne Funktionen einfacher Vergleich ob gleich.
-  //fprintf(TEXTOUT, "\nisunifiable:");
-  //printAtomElemShort(elem);
-  //fprintf(TEXTOUT, " - ");
-  //printAtomElemShort(vergleich);
-  //fprintf(TEXTOUT, " \n");
+
   if(istGleichesAtomElem(elem, vergleich))
   {
     return 1;
@@ -240,15 +245,14 @@ int isUnifiable(atomElem *elem, atomElem *vergleich)
     return 0;
   }
 }
+/* Funktion: unify
+ * Parameter: atomElem *elem, atomElem *vergleich
+ * Returns: unifikatorElem* Enthält die zwei Term Elemente, die sich Unifizieren.
+ * Beschreibung: Geht durch die beiden Atomelemente durch und prüft ob der erste Stelle an der sich beide unterscheiden zur Unifizierung eignen.
+ *               Dabei muss das Prädikat gleich sein und die Variable nicht als Subterm in der Ersetzung vorkommen.
+ */
 unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
 {
-  //fprintf(TEXTOUT, "#####\n" );
-  //fprintf(TEXTOUT, "Unify\n" );
-  //fprintf(TEXTOUT, "elem: %p = ", elem );
-  //printAtomElemShort(elem);
-  //fprintf(TEXTOUT, "\nvergleich: %p = ", vergleich );
-  //printAtomElemShort(vergleich);
-  //fprintf(TEXTOUT, "\n" );
   //Input: Atome s, t
   //Output: au(s, t), wenn s und t unifizierbar sind; nicht unifizierbar“, sonst
   //1: σ := ()
@@ -271,7 +275,6 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
                   fprintf(TEXTOUT, "Term Elem gleich\n" );
                     if(istVariable(tmpElemArg->elem) || istVariable(tmpVergArg->elem))
                     {
-                      //fprintf(TEXTOUT, "Eins der Elemente ist eine Variable \n" );
                       //sei x die Variable, y der andere Term
                       //if x ist echter Subterm von y then
                       //return nicht unifizierbar
@@ -287,7 +290,6 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
                             fprintf(TEXTOUT, " ist ein echter Subterm von " );
                             printTermElemShort(tmpVergArg->elem);
                             fprintf(TEXTOUT, " \n" );
-                            //fprintf(TEXTOUT, "#####\n" );
                             return 0;
                           }else{
 
@@ -302,7 +304,6 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
                             fprintf(TEXTOUT, " ist ein echter Subterm von " );
                             printTermElemShort(tmpElemArg->elem);
                             fprintf(TEXTOUT, " \n" );
-                            //fprintf(TEXTOUT, "#####\n" );
                             return 0;
                           }else{
                             unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpVergArg->elem), copyTermElem(tmpElemArg->elem));
@@ -316,20 +317,11 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
                       //ToDo look Deeper!!!
                       if(tmpVergArg->elem->argument && tmpElemArg->elem->argument)
                       {
-                        //fprintf(TEXTOUT, "looking Deeper into " );
-                        //printTermElemShort(tmpElemArg->elem);
-                        //fprintf(TEXTOUT, " and " );
-                        //printTermElemShort(tmpVergArg->elem);
-                        //fprintf(TEXTOUT, " \n" );
                         unifikatorElem *unifikator = unify(createAtomElem("_temp", tmpElemArg->elem->argument),createAtomElem("_temp", tmpVergArg->elem->argument));
-                        //fprintf(TEXTOUT, "#####\n" );
                         return unifikator;
                       }
 
-
-
                       //return nicht unifizierbar
-                      //fprintf(TEXTOUT, "#####\n" );
                       return 0;
                     }
                 }
@@ -337,21 +329,23 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
               tmpElemArg = tmpElemArg->next;
             }while(tmpElemArg && tmpVergArg);
         }else{
-          //fprintf(TEXTOUT, "#####\n" );
           return 0;
         }
     }else{
       // sei i die erste Position, an der sich σ(s) un if σ(s)|i oder σ(t)|i ist Prädikat then
       // return nicht unifizierbar“
-      //fprintf(TEXTOUT, "#####\n" );
       return 0;
     }
 
 
   }
-  //fprintf(TEXTOUT, "#####\n" );
     return 0;
 }
+/* Funktion: isQueryEmpty
+ * Parameter: formelElem *query
+ * Returns: 0 wenn Falsch, 1 wenn Wahr
+ * Beschreibung: Prüft auf die verschiedenen Möglichkeiten wie eine Query leer sein kann.
+ */
 int isQueryEmpty(formelElem *query)
 {
   if(query)
@@ -376,6 +370,11 @@ int isQueryEmpty(formelElem *query)
   }
 
 }
+/* Funktion: getUnifiableFormels
+ * Parameter: atomElem *l1, formelList *definite
+ * Returns: formelList* mit allen (sysntaktisch) unifizierbaren Formeln.
+ * Beschreibung: geht alle defininiten Formeln durch und prüft ob der Kopf dieser mit dem gegeben Atom Element unifizierbar ist.
+ */
 formelList* getUnifiableFormels(atomElem *l1, formelList *definite)
 {
 
@@ -393,6 +392,11 @@ formelList* getUnifiableFormels(atomElem *l1, formelList *definite)
   }
   return unifiableFormeln;
 }
+/* Funktion: istVariable
+ * Parameter: termElem *elem
+ * Returns: 0 wenn Falsch, 1 wenn Wahr
+ * Beschreibung: Prüft ob der Name des Terms der Definition einer Variable entspricht.
+ */
 int istVariable(termElem *elem)
 {
   if(elem)
@@ -407,13 +411,14 @@ int istVariable(termElem *elem)
     return 0;
   }
 }
+/* Funktion: istEchterSubterm
+ * Parameter: termElem *elem, termElem *vergleich
+ * Returns: 0 wenn Falsch, 1 wenn Wahr.
+ * Beschreibung: Durchsucht das gegebene Vergleichselement rekursiv, ob es darin vorkommt.
+ */
 int istEchterSubterm(termElem *elem, termElem *vergleich)
 {
-  //fprintf(TEXTOUT, " \n ist " );
-  //printTermElemShort(elem);
-  //fprintf(TEXTOUT, "  ein echter Subterm von " );
-  //printTermElemShort(vergleich);
-  //fprintf(TEXTOUT, " ?\n" );
+
   if(!strcmp(elem->name, vergleich->name))
   {
     fprintf(TEXTOUT, "Name gleich\n");

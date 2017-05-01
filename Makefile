@@ -72,7 +72,7 @@ test-u: $(EXEC)
 	for f in $$(ls ./unsatisfiable); do ( 					\
 		printf "Run Testfile $$f"									;\
 		./$(EXEC) ./unsatisfiable/$$f >>/dev/null	;\
-		if [ $$? -ne 0 ]; then											\
+		if [ $$? -eq 1 ]; then											\
 			printf "${GREEN}...Erfolgreich${NC}\n"								;\
 		else																			\
 			printf "${RED}...Fehlgeschlagen${NC}\n"						;\

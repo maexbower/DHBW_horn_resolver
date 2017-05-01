@@ -176,10 +176,6 @@ bodyElem* addToBodyElem(bodyElem *list, atomElem *elem)
 }
 formelList* addToFormelListe(formelList *list, formelElem *elem)
 {
-  //formelList *newList = createFormelListe();
-  //newList->next = list;
-  //newList->elem = elem;
-  //return newList;
     if(list->elem || list->next)
     {
       formelList *newList = createFormelListe();
@@ -232,22 +228,7 @@ atomList* addToAtomListe(atomList *list, atomElem *elem)
 }
 termList* addToTermListe(termList *list, termElem *elem)
 {
-  //termList *newList = createTermListe(elem);
-  //termList *tmp = list;
-  //gehe durch die Liste und füge das Element am Ende ein.
-  //Wenn es bereits existiert füge es nicht nochmal ein.
-  //while(tmp->next)
-  //{
-    //if(istGleichesTermElem(tmp->elem, elem))
-  //  {
-  //    fprintf(TEXTOUT, "gleicher Term in Liste");
-  //    return list;
-  //  }
-  //  tmp = tmp->next;
-  //}
-  //tmp->next = newList;
-  //tmp->next->elem = elem;
-  //return list;
+
   if(list->elem)
   {
     termList *newList = createTermListe(elem);
@@ -256,10 +237,6 @@ termList* addToTermListe(termList *list, termElem *elem)
     //Wenn es bereits existiert füge es nicht nochmal ein.
     do
     {
-      // if(istGleichesTermElem(tmp->elem, elem))
-      // {
-      //   return list;
-      // }
       if(tmp->next)
       {
         tmp = tmp->next;

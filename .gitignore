@@ -1,6 +1,7 @@
 #Ignore all
 *
 
+
 #Do not Ignore Project Files
 !*.c
 !*.h
@@ -14,3 +15,8 @@
 !unsatisfiable
 !satisfiable/*
 !unsatisfiable/*
+
+#ignore generated Files
+hornschemalex.c
+hornschema.tab.c
+hornschema.tab.h

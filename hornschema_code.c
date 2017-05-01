@@ -63,6 +63,8 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
 {
   fprintf(TEXTOUT, "\n");
   fprintf(TEXTOUT, "---------------------\n");
+  fprintf(TEXTOUT, "SLD Satisfiable\n");
+  fprintf(TEXTOUT, "---------------------\n");
   //Returns 0 when unsatisfiable and >0 when satisfiable
   //if query == [] then return unsatisfiable
   tiefe++;
@@ -81,20 +83,57 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
     fprintf(TEXTOUT, "0 Abbruch keine definiten\n");
     return 0;
   }
-  //else let query = {l1 , l2 , ... , ln}
-  atomElem *l1 = query->body->atomlist->elem;
-  //fprintf(TEXTOUT, "l1: %p\n", l1);
-  //let C be the Elements of D whose head is unifiable with l1
-  formelList *unifiableFormeln = getUnifiableFormels(l1, definite);
-
   fprintf(TEXTOUT, "Definite Formeln\n");
   printFormelListeShort(definite);
   fprintf(TEXTOUT, "\n");
   fprintf(TEXTOUT, "Query Formeln\n");
   printFormelElemShort(query);
   fprintf(TEXTOUT, "\n");
-  fprintf(TEXTOUT, "Unifizierbare Formeln\n");
-  printFormelListeShort(unifiableFormeln);
+  //else let query = {l1 , l2 , ... , ln}
+  atomElem *l1 = query->body->atomlist->elem;
+  //fprintf(TEXTOUT, "l1: %p\n", l1);
+  //let C be the Elements of D whose head is unifiable with l1
+  formelList *unifiableFormeln = getUnifiableFormels(l1, definite);
+  if(0 == unifiableFormeln->elem)
+  {
+    fprintf(TEXTOUT, "Keine syntaktische Gleichheit...Suche Unifikator:\n");
+    formelList *tmpDefinite = definite;
+    do{
+      //Wenn das Atom nicht komplett gleich ist prüfe auf Unifizierbarkeit
+      unifikatorElem *unifikator = unify(l1, tmpDefinite->elem->kopf->atom);
+      if(unifikator)
+      {
+
+        fprintf(TEXTOUT, "Unifikator gefunden: ");
+        printUnifikator(unifikator);
+        fprintf(TEXTOUT, "\n");
+        formelList *unifiedDefinite = copyFormelList(definite);
+        fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in den Definiten Formeln ersetzt.\n", replaceVariableInFormelList(unifiedDefinite, unifikator->elem, unifikator->wirdzu));
+        printFormelListeShort(unifiedDefinite);
+        formelElem *unifiedQuery = copyFormelElem(query);
+        fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in Query ersetzt.\n", replaceVariableInFormelElem(unifiedQuery, unifikator->elem, unifikator->wirdzu));
+        printFormelElemShort(unifiedQuery);
+        if(SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe) == 0)
+        {
+          return 0;
+        }
+      }else{
+        fprintf(TEXTOUT, "kein Unifikator für ");
+        printAtomElemShort(l1);
+        fprintf(TEXTOUT, " und ");
+        printAtomElemShort(tmpDefinite->elem->kopf->atom);
+        fprintf(TEXTOUT, " gefunden\n");
+      }
+      tmpDefinite = tmpDefinite->next;
+    } while(tmpDefinite);
+
+
+  }else{
+    fprintf(TEXTOUT, "syntaktische Gleichheit...Unifizierbare Formeln:\n");
+    printFormelListeShort(unifiableFormeln);
+  }
+
+
 
   //for all c e C do
   formelList *tmpUnifiableFormels;
@@ -193,12 +232,23 @@ int isUnifiable(atomElem *elem, atomElem *vergleich)
   //fprintf(TEXTOUT, " - ");
   //printAtomElemShort(vergleich);
   //fprintf(TEXTOUT, " \n");
+  if(istGleichesAtomElem(elem, vergleich))
+  {
+    return 1;
+  }else{
 
-
-  return istGleichesAtomElem(elem, vergleich);
+    return 0;
+  }
 }
 unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
 {
+  //fprintf(TEXTOUT, "#####\n" );
+  //fprintf(TEXTOUT, "Unify\n" );
+  //fprintf(TEXTOUT, "elem: %p = ", elem );
+  //printAtomElemShort(elem);
+  //fprintf(TEXTOUT, "\nvergleich: %p = ", vergleich );
+  //printAtomElemShort(vergleich);
+  //fprintf(TEXTOUT, "\n" );
   //Input: Atome s, t
   //Output: au(s, t), wenn s und t unifizierbar sind; nicht unifizierbar“, sonst
   //1: σ := ()
@@ -207,63 +257,99 @@ unifikatorElem* unify(atomElem *elem, atomElem *vergleich)
     // while σ(s) 6= σ(t) do
     //  sei i die erste Position, an der sich σ(s) und σ(t) unterscheiden
     // sei i die erste Position, an der sich σ(s) un if σ(s)|i oder σ(t)|i ist Prädikat then
-    // return nicht unifizierbar“
     if(strcmp(elem->praedikat, vergleich->praedikat) == 0)
     {
+        fprintf(TEXTOUT, "Prädikat gleich\n" );
         if(elem->argument && vergleich ->argument)
         {
-
-
-            termList *tmpElemArg = elem->argument;
             termList *tmpVergArg = vergleich->argument;
+            termList *tmpElemArg = elem->argument;
             do{
-              if(istGleichesTermElem(tmpElemArg->elem, tmpVergArg->elem) == 0)
-              {
-                  if(istVariable(tmpElemArg->elem) || istVariable(tmpVergArg->elem))
-                  {
-                    //sei x die Variable, y der andere Term
-                    //if x ist echter Subterm von y then
-                    //return nicht unifizierbar
-                    //else
-                    //σ := σ · ([x/y])
-                      if(istVariable(tmpElemArg->elem))
+
+                if(istGleichesTermElem(tmpElemArg->elem, tmpVergArg->elem) == 0)
+                {
+                  fprintf(TEXTOUT, "Term Elem gleich\n" );
+                    if(istVariable(tmpElemArg->elem) || istVariable(tmpVergArg->elem))
+                    {
+                      //fprintf(TEXTOUT, "Eins der Elemente ist eine Variable \n" );
+                      //sei x die Variable, y der andere Term
+                      //if x ist echter Subterm von y then
+                      //return nicht unifizierbar
+                      //else
+                      //σ := σ · ([x/y])
+
+                        if(istVariable(tmpElemArg->elem))
+                        {
+                          //Ist das erste die Variable?
+                          if(istEchterSubterm(tmpElemArg->elem, tmpVergArg->elem))
+                          {
+                            printTermElemShort(tmpElemArg->elem);
+                            fprintf(TEXTOUT, " ist ein echter Subterm von " );
+                            printTermElemShort(tmpVergArg->elem);
+                            fprintf(TEXTOUT, " \n" );
+                            //fprintf(TEXTOUT, "#####\n" );
+                            return 0;
+                          }else{
+
+                            unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpElemArg->elem), copyTermElem(tmpVergArg->elem));
+                            return unifikator;
+                          }
+                        }else{
+                          //Die zweite ist die Variable.
+                          if(istEchterSubterm(tmpVergArg->elem, tmpElemArg->elem))
+                          {
+                            printTermElemShort(tmpVergArg->elem);
+                            fprintf(TEXTOUT, " ist ein echter Subterm von " );
+                            printTermElemShort(tmpElemArg->elem);
+                            fprintf(TEXTOUT, " \n" );
+                            //fprintf(TEXTOUT, "#####\n" );
+                            return 0;
+                          }else{
+                            unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpVergArg->elem), copyTermElem(tmpElemArg->elem));
+                            return unifikator;
+                          }
+                        }
+
+
+                    }else{
+                      //else if weder σ(s)|i noch σ(t)|i ist Variable then
+                      //ToDo look Deeper!!!
+                      if(tmpVergArg->elem->argument && tmpElemArg->elem->argument)
                       {
-                        //Ist das erste die Variable?
-                        if(istEchterSubterm(tmpElemArg->elem, tmpVergArg->elem))
-                        {
-                          return 0;
-                        }else{
-                          unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpVergArg->elem), copyTermElem(tmpElemArg->elem));
-                          return unifikator;
-                        }
-                      }else{
-                        //Die zweite ist die Variable.
-                        if(istEchterSubterm(tmpVergArg->elem, tmpElemArg->elem))
-                        {
-                          return 0;
-                        }else{
-                          unifikatorElem *unifikator = createUnifikator(copyTermElem(tmpElemArg->elem), copyTermElem(tmpVergArg->elem));
-                          return unifikator;
-                        }
+                        //fprintf(TEXTOUT, "looking Deeper into " );
+                        //printTermElemShort(tmpElemArg->elem);
+                        //fprintf(TEXTOUT, " and " );
+                        //printTermElemShort(tmpVergArg->elem);
+                        //fprintf(TEXTOUT, " \n" );
+                        unifikatorElem *unifikator = unify(createAtomElem("_temp", tmpElemArg->elem->argument),createAtomElem("_temp", tmpVergArg->elem->argument));
+                        //fprintf(TEXTOUT, "#####\n" );
+                        return unifikator;
                       }
-                  }else{
-                    //else if weder σ(s)|i noch σ(t)|i ist Variable then
-                    //return nicht unifizierbar
-                    return 0;
-                  }
-              }
-              tmpElemArg = tmpElemArg->next;
+
+
+
+                      //return nicht unifizierbar
+                      //fprintf(TEXTOUT, "#####\n" );
+                      return 0;
+                    }
+                }
               tmpVergArg = tmpVergArg->next;
+              tmpElemArg = tmpElemArg->next;
             }while(tmpElemArg && tmpVergArg);
         }else{
+          //fprintf(TEXTOUT, "#####\n" );
           return 0;
         }
     }else{
+      // sei i die erste Position, an der sich σ(s) un if σ(s)|i oder σ(t)|i ist Prädikat then
+      // return nicht unifizierbar“
+      //fprintf(TEXTOUT, "#####\n" );
       return 0;
     }
 
 
   }
+  //fprintf(TEXTOUT, "#####\n" );
     return 0;
 }
 int isQueryEmpty(formelElem *query)
@@ -292,16 +378,18 @@ int isQueryEmpty(formelElem *query)
 }
 formelList* getUnifiableFormels(atomElem *l1, formelList *definite)
 {
+
   formelList *unifiableFormeln = createFormelListe();
-  if(l1 && definite)
+  formelList *tmpDefinite = definite;
+  if(l1 && tmpDefinite)
   {
     do {
-      if(isUnifiable(l1, definite->elem->kopf->atom))
+      if(isUnifiable(l1, tmpDefinite->elem->kopf->atom))
       {
-        unifiableFormeln = addToFormelListe(unifiableFormeln, copyFormelElem(definite->elem));
+        unifiableFormeln = addToFormelListe(unifiableFormeln, copyFormelElem(tmpDefinite->elem));
       }
-      definite = definite->next;
-    } while(definite);
+      tmpDefinite = tmpDefinite->next;
+    } while(tmpDefinite);
   }
   return unifiableFormeln;
 }
@@ -321,8 +409,14 @@ int istVariable(termElem *elem)
 }
 int istEchterSubterm(termElem *elem, termElem *vergleich)
 {
-  if(strcmp(elem->name, vergleich->name))
+  //fprintf(TEXTOUT, " \n ist " );
+  //printTermElemShort(elem);
+  //fprintf(TEXTOUT, "  ein echter Subterm von " );
+  //printTermElemShort(vergleich);
+  //fprintf(TEXTOUT, " ?\n" );
+  if(!strcmp(elem->name, vergleich->name))
   {
+    fprintf(TEXTOUT, "Name gleich\n");
     return 1;
   }
   if(vergleich->argument)

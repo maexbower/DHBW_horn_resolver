@@ -256,10 +256,10 @@ termList* addToTermListe(termList *list, termElem *elem)
     //Wenn es bereits existiert füge es nicht nochmal ein.
     do
     {
-      if(istGleichesTermElem(tmp->elem, elem))
-      {
-        return list;
-      }
+      // if(istGleichesTermElem(tmp->elem, elem))
+      // {
+      //   return list;
+      // }
       if(tmp->next)
       {
         tmp = tmp->next;
@@ -519,11 +519,23 @@ int replaceVariableInFormelList(formelList *list, termElem *alt, termElem *neu)
     int returnval = 0;
     if(list)
     {
-      returnval += replaceVariableInKopf(list->elem->kopf, alt, neu);
-      returnval += replaceVariableInBody(list->elem->body, alt, neu);
+      if(list->elem)
+      {
+        returnval += replaceVariableInFormelElem(list->elem, alt, neu);
+      }
       returnval += replaceVariableInFormelList(list->next, alt, neu);
     }
     return returnval;
+}
+int replaceVariableInFormelElem(formelElem *elem, termElem *alt, termElem *neu)
+{
+  int returnval = 0;
+  if(elem)
+  {
+    returnval += replaceVariableInKopf(elem->kopf, alt, neu);
+    returnval += replaceVariableInBody(elem->body, alt, neu);
+  }
+  return returnval;
 }
 int replaceVariableInKopf(kopfElem *kopf, termElem *alt, termElem *neu)
 {
@@ -553,6 +565,7 @@ int replaceVariableInAtomList(atomList *list, termElem *alt, termElem *neu)
 }
 int replaceVariableInAtomElem(atomElem *elem, termElem *alt, termElem *neu)
 {
+
   if(elem->argument)
   {
     return replaceVariableInTermListe(elem->argument, alt, neu);
@@ -568,6 +581,11 @@ int replaceVariableInTermListe(termList *list, termElem *alt, termElem *neu)
     {
       list->elem = neu;
       returnval++;
+    }else{
+      if(list->elem->argument)
+      {
+        returnval += replaceVariableInTermListe(list->elem->argument, alt, neu);
+      }
     }
     returnval += replaceVariableInTermListe(list->next, alt, neu);
   }
@@ -708,6 +726,24 @@ termList* copyTermList(termList* list)
   }
   return 0;
 }
+formelList* copyFormelList(formelList* list)
+{
+  if(list)
+  {
+    //fprintf(TEXTOUT, "copy TermList: %p - elem:%p - next:%p\n",list, list->elem, list->next );
+    formelList *newList = createFormelListe(0);
+    if(list->elem)
+    {
+      newList->elem = copyFormelElem(list->elem);
+    }
+    if(list->next)
+    {
+      newList->next = copyFormelList(list->next);
+    }
+    return newList;
+  }
+  return 0;
+}
 termElem* copyTermElem(termElem* elem)
 {
   if(elem)
@@ -795,4 +831,19 @@ void printUnifikator(unifikatorElem *elem)
     }
     fprintf(TEXTOUT,"\n");
   }
+}
+char* addLineCountToVariable(char* name, int linecount)
+{
+  int stellenDerZahl = 1;
+  int zehnerpotenz = 10;
+  while((linecount-zehnerpotenz) > 0)
+  {
+    stellenDerZahl++;
+    zehnerpotenz*=10;
+  }
+  char *text = malloc((sizeof(name)/sizeof(name[0]))+1+stellenDerZahl+1);
+  //fprintf(TEXTOUT, "Größe des alten Strings: %d\n", (int)(sizeof(name)/sizeof(name[0])));
+  sprintf(text, "%s_%d", name, linecount);
+  //fprintf(TEXTOUT, "Größe des neuen Strings: %d\n", (int)(sizeof(text)/sizeof(text[0])));
+  return text;
 }

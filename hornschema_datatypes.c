@@ -256,10 +256,10 @@ termList* addToTermListe(termList *list, termElem *elem)
     //Wenn es bereits existiert füge es nicht nochmal ein.
     do
     {
-      if(istGleichesTermElem(tmp->elem, elem))
-      {
-        return list;
-      }
+      // if(istGleichesTermElem(tmp->elem, elem))
+      // {
+      //   return list;
+      // }
       if(tmp->next)
       {
         tmp = tmp->next;
@@ -581,6 +581,11 @@ int replaceVariableInTermListe(termList *list, termElem *alt, termElem *neu)
     {
       list->elem = neu;
       returnval++;
+    }else{
+      if(list->elem->argument)
+      {
+        returnval += replaceVariableInTermListe(list->elem->argument, alt, neu);
+      }
     }
     returnval += replaceVariableInTermListe(list->next, alt, neu);
   }

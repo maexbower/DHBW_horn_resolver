@@ -53,7 +53,9 @@ forceall:
 	$(LD) hornschema_code.o hornschema_datatypes.o hornschemalex.o hornschema.tab.o -o $(EXEC)
 
 run:
-	./$(EXEC) pg-s-2
+	make test-s
+	make test-u
+	
 test-s: $(EXEC)
 	{ \
 	for f in $$(ls ./satisfiable); do ( 					\

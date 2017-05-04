@@ -818,6 +818,7 @@ char* addLineCountToVariable(char* name, int linecount)
     stellenDerZahl++;
     zehnerpotenz*=10;
   }
+
   char *text = malloc((sizeof(name)/sizeof(name[0]))+1+stellenDerZahl+1);
   //fprintf(TEXTOUT, "Größe des alten Strings: %d\n", (int)(sizeof(name)/sizeof(name[0])));
   sprintf(text, "%s_%d", name, linecount);

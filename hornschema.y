@@ -5,7 +5,7 @@
   extern int yylex(void);
   extern FILE *yyin;
   formelList *formlist;
-
+  extern int linecount;
 %}
 
 

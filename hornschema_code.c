@@ -109,6 +109,9 @@ int SLDsatisfiable(formelElem *query, formelList *definite, int tiefe)
         formelElem *unifiedQuery = copyFormelElem(query);
         fprintf(TEXTOUT, "Es wurden %d Variablen ersetzt in Query ersetzt.\n", replaceVariableInFormelElem(unifiedQuery, unifikator->elem, unifikator->wirdzu));
         printFormelElemShort(unifiedQuery);
+        //disjunk Variables in new formelList
+        unifiedQuery = disjunctFormel(unifiedQuery);
+        unifiedDefinite = disjunctFormels(unifiedDefinite);
         int sldreturn = SLDsatisfiable(unifiedQuery, unifiedDefinite, tiefe);
         if(sldreturn == 0)
         {
@@ -434,6 +437,175 @@ int istEchterSubterm(termElem *elem, termElem *vergleich)
       }
       tmpVergleich = tmpVergleich->next;
     }while(tmpVergleich);
+  }
+  return 0;
+}
+formelElem* disjunctFormel(formelElem *elem)
+{
+  if(elem)
+  {
+    fprintf(TEXTOUT, "disjunct Formel: ");
+    printFormelElemShort(elem);
+    fprintf(TEXTOUT, "\n" );
+    termElem *tmpVar;
+    termElem *newTmpVar = 0;
+    do{
+      tmpVar = getNextVariableInFormelElem(elem, newTmpVar);
+      if(tmpVar)
+      {
+        fprintf(TEXTOUT, "Replace Variable: ");
+        printTermElemShort(tmpVar);
+        fprintf(TEXTOUT, "\n" );
+          newTmpVar = copyTermElem(tmpVar);
+          char* tmpChar = addLineCountToVariable(strdup(newTmpVar->name), linecount++);
+          fprintf(TEXTOUT, "This works %s\n", tmpChar);
+
+          newTmpVar->name = realloc(newTmpVar->name, sizeof(tmpChar));
+          fprintf(TEXTOUT, "New Linecount ist: %d ", linecount);
+          replaceVariableInFormelElem(elem, tmpVar, newTmpVar);
+      }
+
+    }while(newTmpVar);
+
+    return elem;
+  }
+  return 0;
+}
+formelList* disjunctFormels(formelList *list)
+{
+  formelList *tmpList = list;
+  if(tmpList)
+  {
+    do{
+       if(tmpList->elem)
+       {
+         tmpList->elem = disjunctFormel(tmpList->elem);
+
+       }
+       tmpList = tmpList->next;
+    }while(tmpList);
+    return list;
+  }
+  return 0;
+}
+termElem* getNextVariableInFormelElem(formelElem *elem, termElem *lastReplace)
+{
+  if(elem)
+  {
+    termElem *tmpReturn = getNextVariableInKopfElem(elem->kopf, lastReplace);
+    if(tmpReturn)
+    {
+      return tmpReturn;
+    }
+    tmpReturn = getNextVariableInBodyElem(elem->body, lastReplace);
+    if(tmpReturn)
+    {
+      return tmpReturn;
+    }
+  }
+  return 0;
+}
+termElem* getNextVariableInKopfElem(kopfElem *elem, termElem *lastReplace)
+{
+  if(elem)
+  {
+    if(elem->atom)
+    {
+      termElem *tmpReturn =  getNextVariableInAtomElem(elem->atom, lastReplace);
+      if(tmpReturn)
+      {
+        return tmpReturn;
+      }
+    }
+  }
+  return 0;
+}
+termElem* getNextVariableInBodyElem(bodyElem *elem, termElem *lastReplace)
+{
+  if(elem)
+  {
+    if(elem->atomlist)
+    {
+      termElem *tmpReturn = getNextVariableInAtomList(elem->atomlist, lastReplace);
+      if(tmpReturn)
+      {
+        return tmpReturn;
+      }
+    }
+  }
+  return 0;
+}
+termElem* getNextVariableInAtomList(atomList *list, termElem *lastReplace)
+{
+  if(list)
+  {
+    atomList *tmpList = list;
+    do{
+      if(tmpList->elem)
+      {
+        termElem *tmpReturn = getNextVariableInAtomElem(tmpList->elem, lastReplace);
+        if(tmpReturn)
+        {
+          return tmpReturn;
+        }
+      }
+      tmpList = tmpList->next;
+    }while(tmpList);
+  }
+  return 0;
+}
+termElem* getNextVariableInAtomElem(atomElem *elem, termElem *lastReplace)
+{
+  if(elem)
+  {
+    if(elem->argument)
+    {
+      termElem *tmpReturn = getNextVariableInTermList(elem->argument, lastReplace, 0);
+      if(tmpReturn)
+      {
+        return tmpReturn;
+      }
+    }
+  }
+  return 0;
+}
+termElem* getNextVariableInTermList(termList *list, termElem *lastReplace, int lastOneReached)
+{
+  if(list)
+  {
+    if(lastReplace == 0)
+    {
+      lastOneReached = 1;
+    }
+    termList *tmpList = list;
+    do{
+      if(tmpList->elem)
+      {
+
+        if(istVariable(tmpList->elem))
+        {
+          if(lastOneReached)
+          {
+            return tmpList->elem;
+          }
+          if(istGleichesTermElem(lastReplace, tmpList->elem))
+          {
+              lastOneReached = 1;
+          }
+
+        }else{
+          if(tmpList->elem->argument)
+          {
+            termElem *tmpReturn = getNextVariableInTermList(tmpList->elem->argument, lastReplace, lastOneReached);
+            if(tmpReturn)
+            {
+              return tmpReturn;
+            }
+          }
+        }
+      }
+      tmpList = tmpList->next;
+    }while(tmpList);
   }
   return 0;
 }

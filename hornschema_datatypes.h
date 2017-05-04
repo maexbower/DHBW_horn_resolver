@@ -97,4 +97,5 @@ kopfElem* copyKopfElem(kopfElem* elem);
 formelElem* copyFormelElem(formelElem* elem);
 formelList* copyFormelList(formelList* list);
 char* addLineCountToVariable(char* name, int linecount);
+
 #endif
